@@ -39,9 +39,6 @@
     <ClCompile Include="common\CShaderPool.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="common\CSprite2D.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="common\initShader.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -84,8 +81,17 @@
     <ClCompile Include="models\CTorusKnot.cpp">
       <Filter>models</Filter>
     </ClCompile>
-    <ClCompile Include="Example4.cpp">
+    <ClCompile Include="The3DRoom.cpp">
       <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="common\CSprite2D.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="models\CObjModel.cpp">
+      <Filter>models</Filter>
+    </ClCompile>
+    <ClCompile Include="common\CObjLoader.cpp">
+      <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -105,9 +111,6 @@
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="common\CShaderPool.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="common\CSprite2D.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="common\initshader.h">
@@ -154,6 +157,15 @@
     </ClInclude>
     <ClInclude Include="models\CTorusKnot.h">
       <Filter>models</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CSprite2D.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="models\CObjModel.h">
+      <Filter>models</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CObjLoader.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -18,25 +18,31 @@
 #include "common/CCamera.h"
 #include "common/CShaderPool.h"
 #include "../models/CQuad.h"
-#include "../models/CBottle.h"
-#include "../models/CTeapot.h"
 #include "../models/CTorusKnot.h"
 #include "../models/CBox.h"
 #include "../models/CSphere.h"
+#include "../models/CCapsule.h"
+#include "../models/CCup.h"
 
 #include "common/CLight.h"
 #include "common/CMaterial.h"
+#include "../models/CObjModel.h"
 
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 800 
 #define ROW_NUM 30
 
-CBottle  g_bottle(18, 8, 4);
-CTeapot  g_teapot(5);
-CTorusKnot g_tknot(4);
+// 範例模型宣告區
+CCapsule g_capsule;
+CCup g_cup;
+CTorusKnot g_knot(4);
 CBox g_house;
 CSphere g_sphere;
 
+// obj 檔模型宣告區
+CObjModel g_objModel;
+
+// 鏡頭與場景宣告區
 glm::vec3 g_eyeloc(6.0f, 6.0f, 6.0f); // 鏡頭位置, 預設在 (8,8,8) 
 CCube g_centerloc; // view center預設在 (0,0,0)，不做任何描繪操作
 CQuad g_floor[ROW_NUM][ROW_NUM]; 
@@ -47,7 +53,7 @@ GLuint g_shadingProg;
 CLight g_light(glm::vec3(5.0f, 5.0f, 0.0f));
 
 // 全域材質（可依模型分別設定）
-CMaterial g_matBeige;   // 淺米白深麥灰
+CMaterial g_matBeige;   // 淺米白
 CMaterial g_matGray;    //  深麥灰材質
 CMaterial g_matWaterBlue;
 CMaterial g_matWaterGreen;
@@ -83,24 +89,28 @@ void loadScene(void)
         }
     }
 
-    g_bottle.setupVertexAttributes();
-    g_bottle.setShaderID(g_shadingProg, 3);
-    g_bottle.setScale(glm::vec3(0.7f, 0.7f, 0.7f));
-    g_bottle.setPos(glm::vec3(2.5f, 0.0005f, 2.5f));
-    g_bottle.setMaterial(g_matWaterBlue);
+    g_capsule.setupVertexAttributes();
+    g_capsule.setShaderID(g_shadingProg, 3);
+    g_capsule.setPos(glm::vec3(8.0f, 0.5f, -8.0f));
+    g_capsule.setRotate(90, glm::vec3(1, 0, 0));
+    g_capsule.setMaterial(g_matWaterRed);
 
-    g_teapot.setupVertexAttributes();
-    g_teapot.setShaderID(g_shadingProg, 3);
-    g_teapot.setScale(glm::vec3(0.75f, 0.75f, 0.75f));
-    g_teapot.setPos(glm::vec3(-3.0f, 0.0005f, -3.0f));
-    g_teapot.setRotate(45, glm::vec3(0, 1, 0));
-    g_teapot.setMaterial(g_matWaterGreen);
+    g_cup.setupVertexAttributes();
+    g_cup.setShaderID(g_shadingProg, 3);
+    g_cup.setPos(glm::vec3(-8.0f, 0.5f, -8.0f));
+    g_cup.setMaterial(g_matWaterBlue);
 
-    g_tknot.setupVertexAttributes();
-    g_tknot.setShaderID(g_shadingProg, 3);
-    g_tknot.setScale(glm::vec3(0.4f, 0.4f, 0.4f));
-    g_tknot.setPos(glm::vec3(-2.0f, 0.5f, 2.0f));
-    g_tknot.setMaterial(g_matWaterRed);
+    g_objModel.setupVertexAttributes();
+    g_objModel.setShaderID(g_shadingProg, 3);
+    g_objModel.setScale(glm::vec3(5.0f, 5.0f, 5.0f));
+    g_objModel.setPos(glm::vec3(0.0f, 0.0005f, 0.0f)); // 房間正中間
+    g_objModel.setMaterial(g_matWoodLightOak);
+ 
+    g_knot.setupVertexAttributes();
+    g_knot.setShaderID(g_shadingProg, 3);
+    g_knot.setScale(glm::vec3(0.4f, 0.4f, 0.4f));
+    g_knot.setPos(glm::vec3(0.0f, 0.5f, 8.0f));
+    g_knot.setMaterial(g_matWaterGreen);
 
     g_house.setupVertexAttributes();
     g_house.setShaderID(g_shadingProg, 3);
@@ -142,12 +152,15 @@ void render(void)
         }
 
     g_light.drawRaw();
-    g_bottle.uploadMaterial();
-    g_bottle.drawRaw();
-    g_teapot.uploadMaterial();
-    g_teapot.drawRaw();
-    g_tknot.uploadMaterial();
-    g_tknot.drawRaw();
+    
+    g_capsule.uploadMaterial();
+    g_capsule.drawRaw();
+    g_cup.uploadMaterial();
+    g_cup.drawRaw();
+    g_objModel.uploadMaterial();
+    g_objModel.drawRaw();
+    g_knot.uploadMaterial();
+    g_knot.drawRaw();
 
     g_house.uploadMaterial();
     g_house.drawRaw();

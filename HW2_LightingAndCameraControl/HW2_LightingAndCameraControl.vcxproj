@@ -147,11 +147,13 @@
     <ClCompile Include="common\CCamera.cpp" />
     <ClCompile Include="common\CLight.cpp" />
     <ClCompile Include="common\CMaterial.cpp" />
+    <ClCompile Include="common\CObjLoader.cpp" />
     <ClCompile Include="common\CShaderPool.cpp" />
     <ClCompile Include="common\CSprite2D.cpp" />
     <ClCompile Include="common\initShader.cpp" />
     <ClCompile Include="common\wmhandler.cpp" />
-    <ClCompile Include="Example4.cpp" />
+    <ClCompile Include="models\CObjModel.cpp" />
+    <ClCompile Include="The3DRoom.cpp" />
     <ClCompile Include="models\CBottle.cpp" />
     <ClCompile Include="models\CBox.cpp" />
     <ClCompile Include="models\CCapsule.cpp" />
@@ -171,6 +173,7 @@
     <ClInclude Include="common\CCamera.h" />
     <ClInclude Include="common\CLight.h" />
     <ClInclude Include="common\CMaterial.h" />
+    <ClInclude Include="common\CObjLoader.h" />
     <ClInclude Include="common\CShaderPool.h" />
     <ClInclude Include="common\CSprite2D.h" />
     <ClInclude Include="common\initshader.h" />
@@ -183,6 +186,7 @@
     <ClInclude Include="models\CCup.h" />
     <ClInclude Include="models\CCylinder.h" />
     <ClInclude Include="models\CDonut.h" />
+    <ClInclude Include="models\CObjModel.h" />
     <ClInclude Include="models\CQuad.h" />
     <ClInclude Include="models\CShape.h" />
     <ClInclude Include="models\CSphere.h" />
