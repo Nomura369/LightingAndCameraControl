@@ -128,6 +128,10 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 //       
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     glm::vec3 vPos;
+    
+    glm::vec3 front, up, right; // 代表鏡頭的不同軸向
+    float speed = 0.05f; // 鏡頭位移速度
+
     glm::mat4 mxView, mxProj;
     GLint viewLoc, projLoc;
     float shin;
@@ -205,21 +209,25 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                             break;
                         case 'W':
                         case 'w':
-							vPos = g_centerloc.getPos(); // 從代表 center 的 cube 取得位置
-                            g_centerloc.setPos(glm::vec3(vPos.x, vPos.y , vPos.z - 0.05f));
-							g_eyeloc = CCamera::getInstance().getViewLocation(); // 取的 eye 位置
-                            g_eyeloc.z = g_eyeloc.z - 0.05f; // 與 center 同步位移
-							CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
+                            // 往前移動
+                            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
+                            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // center 位置則為 g_centerloc.getPos()
+                            g_eyeloc -= front * speed; // 根據鏡頭朝向方向（front）進行位移
+                            g_centerloc.setPos(g_centerloc.getPos() -= front * speed); // 讓作為 center 的 cube 房間也跟著移動
+                            // 更新攝影機位置與矩陣
+                            CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
                             mxView = CCamera::getInstance().getViewMatrix();
                             viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); // 取得 view matrix 變數的位置
                             glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
                             break;
                         case 'S':
                         case 's':
-                            vPos = g_centerloc.getPos();
-                            g_centerloc.setPos(glm::vec3(vPos.x , vPos.y , vPos.z + 0.05f));
-                            g_eyeloc = CCamera::getInstance().getViewLocation();
-                            g_eyeloc.z = g_eyeloc.z + 0.05f;
+                            // 往後移動
+                            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
+                            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // center 位置則為 g_centerloc.getPos()
+                            g_eyeloc += front * speed; // 根據鏡頭朝向方向（front）進行位移
+                            g_centerloc.setPos(g_centerloc.getPos() += front * speed); // 讓作為 center 的 cube 房間也跟著移動
+                            // 更新攝影機位置與矩陣
                             CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
                             mxView = CCamera::getInstance().getViewMatrix();
                             viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); // 取得 view matrix 變數的位置
@@ -227,10 +235,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                             break;
                         case 'A':
                         case 'a':
-                            vPos = g_centerloc.getPos();
-                            g_centerloc.setPos(glm::vec3(vPos.x - 0.05f, vPos.y, vPos.z));
-                            g_eyeloc = CCamera::getInstance().getViewLocation();
-                            g_eyeloc.x = g_eyeloc.x - 0.05f;
+                            // 往左移動
+                            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
+                            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // center 位置則為 g_centerloc.getPos()
+                            up = CCamera::getInstance().getUpVector();
+                            right = glm::normalize(glm::cross(front, up)); // 取得鏡頭右側軸向
+
+                            g_eyeloc += right * speed; // 根據鏡頭右側（right）進行位移
+                            g_centerloc.setPos(g_centerloc.getPos() += right * speed); // 讓作為 center 的 cube 房間也跟著移動
+                            // 更新攝影機位置與矩陣
                             CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
                             mxView = CCamera::getInstance().getViewMatrix();
                             viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); // 取得 view matrix 變數的位置
@@ -238,10 +251,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                             break;
                         case 'D':
                         case 'd':
-                            vPos = g_centerloc.getPos();
-                            g_centerloc.setPos(glm::vec3(vPos.x + 0.05f, vPos.y, vPos.z));
-                            g_eyeloc = CCamera::getInstance().getViewLocation();
-                            g_eyeloc.x = g_eyeloc.x + 0.05f;
+                            // 往右移動
+                            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
+                            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // center 位置則為 g_centerloc.getPos()
+                            up = CCamera::getInstance().getUpVector();
+                            right = glm::normalize(glm::cross(front, up)); // 取得鏡頭右側軸向
+
+                            g_eyeloc -= right * speed; // 根據鏡頭右側（right）進行位移
+                            g_centerloc.setPos(g_centerloc.getPos() -= right * speed); // 讓作為 center 的 cube 房間也跟著移動
+                            // 更新攝影機位置與矩陣
                             CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
                             mxView = CCamera::getInstance().getViewMatrix();
                             viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); // 取得 view matrix 變數的位置
@@ -249,6 +267,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                             break;
                         case 'L':
                         case 'l':
+                            // 讓點光源進行圓周運動
                             g_light.setMotionEnabled();
                             break;
                     }

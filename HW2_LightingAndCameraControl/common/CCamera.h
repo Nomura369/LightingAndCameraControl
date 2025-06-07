@@ -30,6 +30,7 @@ public:
 	const glm::mat4& getViewMatrix();
 	const glm::mat4& getViewProjectionMatrix() const;
 	CCamera::Type getProjectionType() const;
+	glm::vec3& getUpVector();
 
 protected:
 	// Constructor & Destructor

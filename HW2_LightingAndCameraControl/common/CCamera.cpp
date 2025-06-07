@@ -178,3 +178,7 @@ CCamera::Type CCamera::getProjectionType() const
 {
 	return _type;
 }
+
+glm::vec3& CCamera::getUpVector() {
+	return _up;
+}
