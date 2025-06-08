@@ -169,10 +169,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fshader.glsl">
+    <None Include="f_shader.glsl">
       <Filter>來源檔案</Filter>
     </None>
-    <None Include="vshader.glsl">
+    <None Include="v_shader.glsl">
+      <Filter>來源檔案</Filter>
+    </None>
+    <None Include="f_uishader.glsl">
+      <Filter>來源檔案</Filter>
+    </None>
+    <None Include="v_uishader.glsl">
       <Filter>來源檔案</Filter>
     </None>
   </ItemGroup>

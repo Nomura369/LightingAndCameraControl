@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <array>
 
 #include <glew/include/GL/glew.h>
 #include <glfw/include/GLFW/glfw3.h>
@@ -27,6 +28,7 @@
 #include "common/CLight.h"
 #include "common/CMaterial.h"
 #include "../models/CObjModel.h"
+#include "common/CButton.h"
 
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 800 
@@ -48,6 +50,7 @@ CCube g_centerloc; // view center 預設在 (0,0,0)，不做任何描繪操作
 CQuad g_floor[ROW_NUM][ROW_NUM]; 
 
 GLuint g_shadingProg;
+GLuint g_uiShadingProg;
 
 // 全域光源 (位置在 5,5,0)
 CLight g_light(glm::vec3(5.0f, 5.0f, 0.0f)); // 預設為點光源
@@ -65,13 +68,32 @@ CMaterial g_matWoodHoney;
 CMaterial g_matWoodLightOak;
 CMaterial g_matWoodBleached;
 
+// 2D 素材宣告區
+std::array<CButton, 4> g_button = {
+    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.85f, 0.2f, 1.0f), glm::vec4(0.9f, 0.7f, 0.1f, 1.0f)), // 點光源 yellow
+    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.7f, 0.85f, 1.0f), glm::vec4(0.85f, 0.55f, 0.7f, 1.0f)), // 藥丸聚光燈 pink
+    CButton(50.0f, 50.0f, glm::vec4(0.65f, 0.9f, 1.0f, 1.0f), glm::vec4(0.5f, 0.75f, 0.9f, 1.0f)), // 杯子聚光燈 blue
+    CButton(50.0f, 50.0f, glm::vec4(0.65f, 1.0f, 0.75f, 1.0f), glm::vec4(0.50f, 0.85f, 0.65f, 1.0f)), // 紐結聚光燈 green
+};
+
+// 投影矩陣
+GLint viewLoc;
+GLint projLoc;
+glm::mat4 mxView;
+glm::mat4 mxProj;
+GLint uiViewLoc;
+GLint uiProjLoc;
+glm::mat4 mxUiView;
+glm::mat4 mxUiProj;
+
 void genMaterial();
 
 //----------------------------------------------------------------------------
 void loadScene(void)
 {
     genMaterial(); // 產生材質
-    g_shadingProg = CShaderPool::getInstance().getShader("vshader.glsl", "fshader.glsl");   
+    g_shadingProg = CShaderPool::getInstance().getShader("v_shader.glsl", "f_shader.glsl");  
+    g_uiShadingProg = CShaderPool::getInstance().getShader("v_uishader.glsl", "f_uishader.glsl");
     
     // 設定燈光
     g_light.setShaderID(g_shadingProg, "uLight[0]");
@@ -134,16 +156,35 @@ void loadScene(void)
     CCamera::getInstance().updateView(g_eyeloc); // 設定 eye 位置
     CCamera::getInstance().updateCenter(glm::vec3(0,4,0));
 	CCamera::getInstance().updatePerspective(45.0f, (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
-    glm::mat4 mxView = CCamera::getInstance().getViewMatrix();
-	glm::mat4 mxProj = CCamera::getInstance().getProjectionMatrix();
+    mxView = CCamera::getInstance().getViewMatrix();
+	mxProj = CCamera::getInstance().getProjectionMatrix();
 
-    GLint viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); 	// 取得 view matrix 變數的位置
+    viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); 	// 取得 view matrix 變數的位置 v
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
 
-    GLint projLoc = glGetUniformLocation(g_shadingProg, "mxProj"); 	// 取得投影矩陣變數的位置
+    projLoc = glGetUniformLocation(g_shadingProg, "mxProj"); 	// 取得投影矩陣變數的位置 v
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(mxProj));
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 設定清除 back buffer 背景的顏色
+    // UI 設定
+    g_button[0].setScreenPos(125.0f, -350.0f);
+    g_button[0].init(g_uiShadingProg);
+    g_button[1].setScreenPos(200.0f, -350.0f);
+    g_button[1].init(g_uiShadingProg);
+    g_button[2].setScreenPos(275.0f, -350.0f);
+    g_button[2].init(g_uiShadingProg);
+    g_button[3].setScreenPos(350.0f, -350.0f);
+    g_button[3].init(g_uiShadingProg);
+    
+    mxUiView = glm::mat4(1.0f);
+    mxUiProj = glm::ortho(-(float)SCREEN_WIDTH / 2, (float)SCREEN_WIDTH / 2, -(float)SCREEN_HEIGHT / 2, (float)SCREEN_HEIGHT / 2, -1.0f, 1.0f);
+
+    uiViewLoc = glGetUniformLocation(g_uiShadingProg, "mxView"); 	// 取得 view matrix 變數的位置 v
+    glUniformMatrix4fv(uiViewLoc, 1, GL_FALSE, glm::value_ptr(mxUiView));
+
+    uiProjLoc = glGetUniformLocation(g_uiShadingProg, "mxProj"); 	// 取得投影矩陣變數的位置 v
+    glUniformMatrix4fv(uiProjLoc, 1, GL_FALSE, glm::value_ptr(mxUiProj));
+  
+    glClearColor(0.0f, 0.0f, 0.5f, 1.0f); // 設定清除 back buffer 背景的顏色
     glEnable(GL_DEPTH_TEST); // 啟動深度測試
 }
 //----------------------------------------------------------------------------
@@ -159,6 +200,13 @@ void render(void)
     g_cupSpotLight.updateToShader();
     g_knotSpotLight.updateToShader();
     glUniform3fv(glGetUniformLocation(g_shadingProg, "viewPos"), 1, glm::value_ptr(g_eyeloc));
+    //glUniform3fv(glGetUniformLocation(g_shadingProg, "lightPos"), 1, glm::value_ptr(g_light.getPos()));
+    
+    // 先切換回 3d 投影畫模型，再切換到 2d 投影畫 UI
+    mxView = CCamera::getInstance().getViewMatrix();
+    mxProj = CCamera::getInstance().getProjectionMatrix();
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(mxProj));
 
     for (int i = 0; i < ROW_NUM; i++)
         for (int j = 0; j < ROW_NUM; j++) {
@@ -182,6 +230,14 @@ void render(void)
 
     g_house.uploadMaterial();
     g_house.drawRaw();
+
+    glUseProgram(g_uiShadingProg);
+    glUniformMatrix4fv(uiViewLoc, 1, GL_FALSE, glm::value_ptr(mxUiView));
+    glUniformMatrix4fv(uiProjLoc, 1, GL_FALSE, glm::value_ptr(mxUiProj));
+
+    for (int i = 0; i < 4; i++) {
+        g_button[i].draw();
+    }
 }
 //----------------------------------------------------------------------------
 

@@ -194,8 +194,10 @@
     <ClInclude Include="models\CTorusKnot.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fshader.glsl" />
-    <None Include="vshader.glsl" />
+    <None Include="f_shader.glsl" />
+    <None Include="f_uishader.glsl" />
+    <None Include="v_shader.glsl" />
+    <None Include="v_uishader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
