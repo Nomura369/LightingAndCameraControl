@@ -44,13 +44,16 @@ CObjModel g_objModel;
 
 // 鏡頭與場景宣告區
 glm::vec3 g_eyeloc(6.0f, 6.0f, 6.0f); // 鏡頭位置, 預設在 (8,8,8) 
-CCube g_centerloc; // view center預設在 (0,0,0)，不做任何描繪操作
+CCube g_centerloc; // view center 預設在 (0,0,0)，不做任何描繪操作
 CQuad g_floor[ROW_NUM][ROW_NUM]; 
 
 GLuint g_shadingProg;
 
 // 全域光源 (位置在 5,5,0)
-CLight g_light(glm::vec3(5.0f, 5.0f, 0.0f));
+CLight g_light(glm::vec3(5.0f, 5.0f, 0.0f)); // 預設為點光源
+CLight g_capSpotLight(glm::vec3(10.0f, 10.0f, -10.0f), glm::vec3(8.0f, 0.5f, -8.0f)); // 照亮 capsule 模型
+CLight g_cupSpotLight(glm::vec3(-10.0f, 10.0f, -10.0f), glm::vec3(-8.0f, 0.5f, -8.0f)); // 照亮 cup 模型
+CLight g_knotSpotLight(glm::vec3(0.0f, 10.0f, 10.0f), glm::vec3(0.0f, 0.5f, 8.0f)); // 照亮 knot 模型
 
 // 全域材質（可依模型分別設定）
 CMaterial g_matBeige;   // 淺米白
@@ -67,12 +70,20 @@ void genMaterial();
 //----------------------------------------------------------------------------
 void loadScene(void)
 {
-    genMaterial();
-    g_shadingProg = CShaderPool::getInstance().getShader("v_npr.glsl", "f_npr.glsl");   
-    g_light.setShaderID(g_shadingProg, "uLight");
-    //g_light.setTarget(glm::vec3(0, 2, 0));
-    //g_light.setCutOffDeg(20.0f, 90.0f);
-    //g_light.setCutOffDeg(20.0f, 90.0f, 8.0f);
+    genMaterial(); // 產生材質
+    g_shadingProg = CShaderPool::getInstance().getShader("vshader.glsl", "fshader.glsl");   
+    
+    // 設定燈光
+    g_light.setShaderID(g_shadingProg, "uLight[0]");
+    g_capSpotLight.setShaderID(g_shadingProg, "uLight[1]");
+    g_capSpotLight.setCutOffDeg(10.0f, 30.0f, 1.5f); // 第三引數為聚焦指數（optional）
+    g_cupSpotLight.setShaderID(g_shadingProg, "uLight[2]");
+    g_cupSpotLight.setCutOffDeg(10.0f, 30.0f, 1.5f);
+    g_knotSpotLight.setShaderID(g_shadingProg, "uLight[3]");
+    g_knotSpotLight.setCutOffDeg(10.0f, 30.0f, 1.5f);
+
+    glUniform1i(glGetUniformLocation(g_shadingProg, "uLightNum"), 4);
+    glUniform1i(glGetUniformLocation(g_shadingProg, "uIsNpr"), 0);
 
     int k = 0;
     for (int i = 0; i < ROW_NUM; i++)
@@ -84,7 +95,7 @@ void loadScene(void)
             g_floor[i][j].setPos(glm::vec3((ROW_NUM / 2) - 0.5f - (float)i, 0.0f, (float)j - (ROW_NUM / 2) + 0.5f));
             g_floor[i][j].setRotate(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
             if (k % 2) g_floor[i][j].setMaterial(g_matBeige);
-            else g_floor[i][j].setMaterial(g_matGray);
+            else g_floor[i][j].setMaterial(g_matWoodHoney);
             k++;
         }
     }
@@ -142,8 +153,10 @@ void render(void)
 
     //上傳光源與相機位置
     g_light.updateToShader();
+    g_capSpotLight.updateToShader();
+    g_cupSpotLight.updateToShader();
+    g_knotSpotLight.updateToShader();
     glUniform3fv(glGetUniformLocation(g_shadingProg, "viewPos"), 1, glm::value_ptr(g_eyeloc));
-    glUniform3fv(glGetUniformLocation(g_shadingProg, "lightPos"), 1, glm::value_ptr(g_light.getPos()));
 
     for (int i = 0; i < ROW_NUM; i++)
         for (int j = 0; j < ROW_NUM; j++) {
@@ -152,7 +165,10 @@ void render(void)
         }
 
     g_light.drawRaw();
-    
+    g_capSpotLight.drawRaw(); // g_capSpotTarget 不用特別繪製
+    g_cupSpotLight.drawRaw();
+    g_knotSpotLight.drawRaw();
+
     g_capsule.uploadMaterial();
     g_capsule.drawRaw();
     g_cup.uploadMaterial();
@@ -191,7 +207,7 @@ int main() {
     //glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // 禁止視窗大小改變
 
     // 建立 OpenGL 視窗與該視窗執行時所需的的狀態、資源和環境(context 上下文)
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "OpenGL_4 Example 4 NPR", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Lighting & Camera Control", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();

@@ -1,7 +1,7 @@
-// v_phong.glsl
+// vshader.glsl -> combine phong and npr
 #version 330 core
 layout(location=0) in vec3 aPos;
-layout(location=1) in vec3 aColor;    // ³»ÂIÃC¦â¼Ò¦¡¥Î
+layout(location=1) in vec3 aColor;    // é ‚é»é¡è‰²æ¨¡å¼ç”¨
 layout(location=2) in vec3 aNormal;
 layout(location=3) in vec2 aTex;    // Texture Coordinates
 
@@ -9,14 +9,14 @@ uniform mat4 mxModel;
 uniform mat4 mxView;
 uniform mat4 mxProj;
 
-uniform vec3 viewPos;   // ·Ó©ú­pºâ¥²¶·¦³ÃèÀY¦ì¸m 
-uniform vec3 lightPos;  // ·Ó©ú­pºâ¥²¶·¦³¥ú·½¦ì¸m 
+uniform vec3 viewPos;   // ç…§æ˜è¨ˆç®—å¿…é ˆæœ‰é¡é ­ä½ç½® 
+uniform vec3 lightPos;  // ç…§æ˜è¨ˆç®—å¿…é ˆæœ‰å…‰æºä½ç½® 
 
-out vec3 vNormal;      // ³»ÂIªºªk¦V¶q (N)
-out vec3 vLight;       // ³»ÂI«ü¦V¥ú·½ªº Light(L) ¦V¶q
-out vec3 vView;        // ³»ÂI«ü¦V view ªº view(V) ¦V¶q
-out vec3 vColor;       // ³»ÂIÃC¦â
-out vec3 v3Pos;        // ³»ÂIªº¦ì¸m 
+out vec3 vNormal;      // é ‚é»çš„æ³•å‘é‡ (N)
+out vec3 vLight;       // é ‚é»æŒ‡å‘å…‰æºçš„ Light(L) å‘é‡
+out vec3 vView;        // é ‚é»æŒ‡å‘ view çš„ view(V) å‘é‡
+out vec3 vColor;       // é ‚é»é¡è‰²
+out vec3 v3Pos;        // é ‚é»çš„ä½ç½® 
 
 void main() {
     vec4 worldPos = mxModel * vec4(aPos, 1.0);
@@ -27,4 +27,3 @@ void main() {
     vColor   = aColor;
     gl_Position = mxProj * mxView * worldPos;
 }
-

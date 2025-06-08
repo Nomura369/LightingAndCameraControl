@@ -187,5 +187,11 @@
     <None Include="v_phong.glsl">
       <Filter>來源檔案</Filter>
     </None>
+    <None Include="fshader.glsl">
+      <Filter>來源檔案</Filter>
+    </None>
+    <None Include="vshader.glsl">
+      <Filter>來源檔案</Filter>
+    </None>
   </ItemGroup>
 </Project>

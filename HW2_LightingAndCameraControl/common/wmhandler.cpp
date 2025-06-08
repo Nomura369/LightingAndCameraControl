@@ -14,7 +14,7 @@
 #include "../models/CTeapot.h"
 #include "../common/CLight.h"
 
-//#define SPOT_TARGET  // Example 2 解開
+//#define SPOT_TARGET
 
 extern Arcball g_arcball;
 
@@ -127,7 +127,7 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 //           搭配檢查左右 shift 鍵是否按下是大寫還是小寫(假設 caps 鍵沒有被按下)
 //       
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    //glm::vec3 vPos;
+    glm::vec3 vPos;
     
     glm::vec3 front, up, right; // 代表鏡頭的不同軸向
     float speed = 0.05f; // 鏡頭位移速度
