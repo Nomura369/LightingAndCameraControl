@@ -129,7 +129,9 @@ void loadScene(void)
     g_house.setPos(glm::vec3(0.0f, 5.95f, 0.0f));
     g_house.setMaterial(g_matWoodBleached);
 
-	CCamera::getInstance().updateView(g_eyeloc); // 設定 eye 位置
+    g_centerloc.setPos(glm::vec3(0.0f, 4.0f, 0.0f)); // 設定 center 位置
+    
+    CCamera::getInstance().updateView(g_eyeloc); // 設定 eye 位置
     CCamera::getInstance().updateCenter(glm::vec3(0,4,0));
 	CCamera::getInstance().updatePerspective(45.0f, (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
     glm::mat4 mxView = CCamera::getInstance().getViewMatrix();

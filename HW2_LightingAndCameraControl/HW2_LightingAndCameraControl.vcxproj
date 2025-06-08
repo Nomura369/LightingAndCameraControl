@@ -195,13 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fshader.glsl" />
-    <None Include="f_gouraud.glsl" />
-    <None Include="f_npr.glsl" />
-    <None Include="f_phong.glsl" />
     <None Include="vshader.glsl" />
-    <None Include="v_gouraud.glsl" />
-    <None Include="v_npr.glsl" />
-    <None Include="v_phong.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

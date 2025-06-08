@@ -169,24 +169,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="f_gouraud.glsl">
-      <Filter>來源檔案</Filter>
-    </None>
-    <None Include="f_npr.glsl">
-      <Filter>來源檔案</Filter>
-    </None>
-    <None Include="f_phong.glsl">
-      <Filter>來源檔案</Filter>
-    </None>
-    <None Include="v_gouraud.glsl">
-      <Filter>來源檔案</Filter>
-    </None>
-    <None Include="v_npr.glsl">
-      <Filter>來源檔案</Filter>
-    </None>
-    <None Include="v_phong.glsl">
-      <Filter>來源檔案</Filter>
-    </None>
     <None Include="fshader.glsl">
       <Filter>來源檔案</Filter>
     </None>

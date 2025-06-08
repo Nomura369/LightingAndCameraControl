@@ -146,7 +146,8 @@ void CCamera::updateViewMatrix(float theta, float phi)
 
 void CCamera::updateRadius(float delta) {
 	_radius += delta;
-	if (_radius < 1.0f) _radius = 1.0f;  // 限制最小距離
+	//if (_radius < 1.0f) _radius = 1.0f;  // 限制最小距離
+	
 	// 更新相機位置
 	_view.x = _center.x + _radius * sin(_phi) * cos(_theta);
 	_view.y = _center.y + _radius * cos(_phi);
@@ -181,4 +182,8 @@ CCamera::Type CCamera::getProjectionType() const
 
 glm::vec3& CCamera::getUpVector() {
 	return _up;
+}
+
+float CCamera::getRadius() { 
+	return _radius; 
 }

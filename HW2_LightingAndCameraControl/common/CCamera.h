@@ -31,6 +31,7 @@ public:
 	const glm::mat4& getViewProjectionMatrix() const;
 	CCamera::Type getProjectionType() const;
 	glm::vec3& getUpVector();
+	float getRadius();
 
 protected:
 	// Constructor & Destructor
