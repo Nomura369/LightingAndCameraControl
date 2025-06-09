@@ -154,17 +154,13 @@
     <ClCompile Include="common\wmhandler.cpp" />
     <ClCompile Include="models\CObjModel.cpp" />
     <ClCompile Include="The3DRoom.cpp" />
-    <ClCompile Include="models\CBottle.cpp" />
     <ClCompile Include="models\CBox.cpp" />
     <ClCompile Include="models\CCapsule.cpp" />
     <ClCompile Include="models\CCube.cpp" />
     <ClCompile Include="models\CCup.cpp" />
-    <ClCompile Include="models\CCylinder.cpp" />
-    <ClCompile Include="models\CDonut.cpp" />
     <ClCompile Include="models\CQuad.cpp" />
     <ClCompile Include="models\CShape.cpp" />
     <ClCompile Include="models\CSphere.cpp" />
-    <ClCompile Include="models\CTeapot.cpp" />
     <ClCompile Include="models\CTorusKnot.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -179,18 +175,14 @@
     <ClInclude Include="common\initshader.h" />
     <ClInclude Include="common\typedefs.h" />
     <ClInclude Include="common\wmhandler.h" />
-    <ClInclude Include="models\CBottle.h" />
     <ClInclude Include="models\CBox.h" />
     <ClInclude Include="models\CCapsule.h" />
     <ClInclude Include="models\CCube.h" />
     <ClInclude Include="models\CCup.h" />
-    <ClInclude Include="models\CCylinder.h" />
-    <ClInclude Include="models\CDonut.h" />
     <ClInclude Include="models\CObjModel.h" />
     <ClInclude Include="models\CQuad.h" />
     <ClInclude Include="models\CShape.h" />
     <ClInclude Include="models\CSphere.h" />
-    <ClInclude Include="models\CTeapot.h" />
     <ClInclude Include="models\CTorusKnot.h" />
   </ItemGroup>
   <ItemGroup>

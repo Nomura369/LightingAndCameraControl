@@ -45,9 +45,6 @@
     <ClCompile Include="common\wmhandler.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="models\CBottle.cpp">
-      <Filter>models</Filter>
-    </ClCompile>
     <ClCompile Include="models\CBox.cpp">
       <Filter>models</Filter>
     </ClCompile>
@@ -60,12 +57,6 @@
     <ClCompile Include="models\CCup.cpp">
       <Filter>models</Filter>
     </ClCompile>
-    <ClCompile Include="models\CCylinder.cpp">
-      <Filter>models</Filter>
-    </ClCompile>
-    <ClCompile Include="models\CDonut.cpp">
-      <Filter>models</Filter>
-    </ClCompile>
     <ClCompile Include="models\CQuad.cpp">
       <Filter>models</Filter>
     </ClCompile>
@@ -73,9 +64,6 @@
       <Filter>models</Filter>
     </ClCompile>
     <ClCompile Include="models\CSphere.cpp">
-      <Filter>models</Filter>
-    </ClCompile>
-    <ClCompile Include="models\CTeapot.cpp">
       <Filter>models</Filter>
     </ClCompile>
     <ClCompile Include="models\CTorusKnot.cpp">
@@ -122,9 +110,6 @@
     <ClInclude Include="common\wmhandler.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="models\CBottle.h">
-      <Filter>models</Filter>
-    </ClInclude>
     <ClInclude Include="models\CBox.h">
       <Filter>models</Filter>
     </ClInclude>
@@ -137,12 +122,6 @@
     <ClInclude Include="models\CCup.h">
       <Filter>models</Filter>
     </ClInclude>
-    <ClInclude Include="models\CCylinder.h">
-      <Filter>models</Filter>
-    </ClInclude>
-    <ClInclude Include="models\CDonut.h">
-      <Filter>models</Filter>
-    </ClInclude>
     <ClInclude Include="models\CQuad.h">
       <Filter>models</Filter>
     </ClInclude>
@@ -150,9 +129,6 @@
       <Filter>models</Filter>
     </ClInclude>
     <ClInclude Include="models\CSphere.h">
-      <Filter>models</Filter>
-    </ClInclude>
-    <ClInclude Include="models\CTeapot.h">
       <Filter>models</Filter>
     </ClInclude>
     <ClInclude Include="models\CTorusKnot.h">
