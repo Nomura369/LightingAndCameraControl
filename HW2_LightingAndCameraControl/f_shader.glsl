@@ -37,7 +37,7 @@ struct Material {
 uniform Material uMaterial;
 out vec4 FragColor;
 
-uniform int uIsNpr;
+uniform int uIsNpr; // 是否將照明切換成卡通風格
 
 void main() {
     // 模式切換：1 = 頂點顏色、2 = 模型顏色，3 = Per Pixel Lighting
@@ -69,16 +69,24 @@ void main() {
         // Spot Light 漸變（如有設定 cutOff > 0）
         if(uLight[i].cutOff > 0.0) {
             float theta = dot(L, normalize(-uLight[i].direction));
-            float intensity = clamp(
-                (theta - uLight[i].outerCutOff) /
-                (uLight[i].cutOff - uLight[i].outerCutOff),
-                0.0, 1.0
-            );
-            if(uIsNpr != 0) atten *= intensity;
+            
+            float intensity;
+            if (uIsNpr != 0) {
+                // 只有落在 cutOff 範圍內才有光
+                intensity = theta > uLight[i].cutOff ? 1.0 : 0.0;
+            } 
             else {
-                if( abs(uLight[i].exponent - 1.0) < 0.001 ) atten *= intensity;
-                else { atten *= pow(intensity, uLight[i].exponent); }
+                // 原本的柔邊計算
+                intensity = clamp(
+                    (theta - uLight[i].outerCutOff) /
+                    (uLight[i].cutOff - uLight[i].outerCutOff),
+                    0.0, 1.0
+                );
+                if (abs(uLight[i].exponent - 1.0) >= 0.001){
+                    intensity = pow(intensity, uLight[i].exponent);
+                }
             }
+        atten *= intensity;
         }
         
         

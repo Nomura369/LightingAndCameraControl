@@ -87,6 +87,9 @@ GLint g_uiProjLoc;
 glm::mat4 g_mxUiView;
 glm::mat4 g_mxUiProj;
 
+// 切換照明風格（是否為卡通）
+bool g_isNpr = false;
+
 void genMaterial();
 
 //----------------------------------------------------------------------------
@@ -99,14 +102,14 @@ void loadScene(void)
     // 設定燈光
     g_light.setShaderID(g_shadingProg, "uLight[0]");
     g_capSpotLight.setShaderID(g_shadingProg, "uLight[1]");
-    g_capSpotLight.setCutOffDeg(10.0f, 30.0f, 1.5f); // 第三引數為聚焦指數（optional）
+    g_capSpotLight.setCutOffDeg(20.0f, 60.0f, 1.5f); // 第三引數為聚焦指數（optional）
     g_cupSpotLight.setShaderID(g_shadingProg, "uLight[2]");
-    g_cupSpotLight.setCutOffDeg(10.0f, 30.0f, 1.5f);
+    g_cupSpotLight.setCutOffDeg(20.0f, 60.0f, 1.5f);
     g_knotSpotLight.setShaderID(g_shadingProg, "uLight[3]");
-    g_knotSpotLight.setCutOffDeg(10.0f, 30.0f, 1.5f);
+    g_knotSpotLight.setCutOffDeg(20.0f, 60.0f, 1.5f);
 
     glUniform1i(glGetUniformLocation(g_shadingProg, "uLightNum"), 4);
-    glUniform1i(glGetUniformLocation(g_shadingProg, "uIsNpr"), 0);
+    glUniform1i(glGetUniformLocation(g_shadingProg, "uIsNpr"), 0); // 切換照明風格（是否為卡通）
 
     int k = 0;
     for (int i = 0; i < ROW_NUM; i++)
@@ -202,6 +205,7 @@ void render(void)
     g_knotSpotLight.updateToShader();
     glUniform3fv(glGetUniformLocation(g_shadingProg, "viewPos"), 1, glm::value_ptr(g_eyeloc));
     //glUniform3fv(glGetUniformLocation(g_shadingProg, "lightPos"), 1, glm::value_ptr(g_light.getPos()));
+    glUniform1i(glGetUniformLocation(g_shadingProg, "uIsNpr"), (int)g_isNpr); // 切換照明風格（是否為卡通）
     
     // 先切換回 3d 投影畫模型，再切換到 2d 投影畫 UI
     g_mxView = CCamera::getInstance().getViewMatrix();
@@ -244,7 +248,7 @@ void render(void)
 
 void update(float dt)
 {
-    if(g_button[0].isActive()) g_light.setMotionEnabled(); // 讓點光源進行圓周運動
+    g_light.setMotionEnabled(g_button[0].isActive()); // 讓點光源進行圓周運動
     g_capSpotLight.setLightOn(g_button[1].isActive());
     g_cupSpotLight.setLightOn(g_button[2].isActive());
     g_knotSpotLight.setLightOn(g_button[3].isActive());

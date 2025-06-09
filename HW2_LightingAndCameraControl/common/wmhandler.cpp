@@ -33,6 +33,7 @@ extern CMaterial g_matWaterGreen;
 extern CSphere  g_sphere; 
 
 extern std::array<CButton, 4> g_button;
+extern bool g_isNpr;
 
 Arcball g_arcball; //保留未用
 
@@ -158,9 +159,11 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     float speed = 0.05f; // 鏡頭位移速度
     glm::vec3 eyeloc, centerloc; // 暫存 g_eyeloc 和 g_centerloc 以方便計算
 
-    glm::mat4 mxView, mxProj;
-    GLint viewLoc, projLoc;
-    float shin;
+    glm::mat4 mxView;
+    // glm::mat4 mxProj;
+    GLint viewLoc;
+    // GLint projLoc;
+    // float shin;
 
     switch (key)
     {
@@ -201,38 +204,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                     char letter = (isShiftPressed) ? ('A' + (key - GLFW_KEY_A)) : ('a' + (key - GLFW_KEY_A));
                     //std::cout << "key = " << letter << std::endl;
                     switch (letter) {
-                        case 'g': // 此處用來減少材質的 shininess, Example3 再增加
-                            shin = g_matWaterGreen.getShininess() - 0.5f;
-                            if (shin <= 1) shin = 1;
-                            //std::cout << shin << std::endl;
-                            g_matWaterGreen.setShininess(shin);
-                            g_sphere.setMaterial(g_matWaterGreen);
-                            break;
-                        case 'G': // 此處用來增加材質的 shininess, Example3 再增加
-                            shin = g_matWaterGreen.getShininess() + 0.5f;
-                            if (shin >= 500 ) shin = 500;
-                            //std::cout << shin << std::endl;
-                            g_matWaterGreen.setShininess(shin);
-                            g_sphere.setMaterial(g_matWaterGreen);
-                        break;
-                        case 'P':
-                        case 'p':
-							if (CCamera::getInstance().getProjectionType() != CCamera::Type::PERSPECTIVE) {
-								CCamera::getInstance().updatePerspective(45.0f, 1.0f, 1.0f, 100.0f);
-                                mxProj = CCamera::getInstance().getProjectionMatrix();
-                                projLoc = glGetUniformLocation(g_shadingProg, "mxProj"); // 取得 projection matrix 變數位置
-                                glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(mxProj));
-                            }
-                            break;
-						case 'O':
-						case 'o':
-                            if (CCamera::getInstance().getProjectionType() != CCamera::Type::ORTHOGRAPHIC) {
-								CCamera::getInstance().updateOrthographic(-3.0f, 3.0f, -3.0f, 3.0f, 1.0f, 100.0f);
-                                mxProj = CCamera::getInstance().getProjectionMatrix();
-                                projLoc = glGetUniformLocation(g_shadingProg, "mxProj"); // 取得 projection matrix 變數位置
-                                glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(mxProj));
-                            } 
-                            break;
                         case 'W':
                         case 'w':
                             // 往前移動
@@ -311,11 +282,11 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                                 glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
                             }
                             break;
-                        //case 'L':
-                        //case 'l':
-                        //    // 讓點光源進行圓周運動
-                        //    g_light.setMotionEnabled();
-                        //    break;
+                        case 'N':
+                        case 'n':
+                            // 切換照明風格（是否為卡通）
+                            g_isNpr = !g_isNpr;
+                            break;
                     }
                 }   
             }

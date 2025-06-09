@@ -84,7 +84,7 @@ void CLight::setLightOn(bool enable) {
 }
 bool CLight::isLightOn(){ return _lighingOn; }
 
-void CLight::setMotionEnabled() { _motionOn = !_motionOn; }
+void CLight::setMotionEnabled(bool enable) { _motionOn = enable; }
 
 // 設定 shaderID 時，預設光源物件顯示為 true
 void CLight::setShaderID(GLuint shaderProg, std::string name, bool displayon)
