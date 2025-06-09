@@ -38,6 +38,8 @@ extern CSphere  g_sphere;
 
 extern std::array<CButton, 4> g_button;
 extern bool g_isNpr;
+extern bool g_isGradient;
+extern float g_colorTime;
 
 Arcball g_arcball; //保留未用
 
@@ -389,35 +391,53 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                             break;
                         case 'R':
                         case 'r':
-                            // 將房間換成紅色系照明
-                            g_light.setAmbient(reds[0]);
-                            g_light.setDiffuse(reds[1]);
-                            g_light.setSpecular(reds[2]);
-                            std::cout << "紅色系房間" << std::endl << std::endl;
+                            if (!g_isGradient) {
+                                // 將房間換成紅色系照明
+                                g_light.setAmbient(reds[0]);
+                                g_light.setDiffuse(reds[1]);
+                                g_light.setSpecular(reds[2]);
+                                std::cout << "紅色系房間" << std::endl << std::endl;
+                            }
                             break;
                         case 'G':
                         case 'g':
-                            // 將房間換成綠色系照明
-                            g_light.setAmbient(greens[0]);
-                            g_light.setDiffuse(greens[1]);
-                            g_light.setSpecular(greens[2]);
-                            std::cout << "綠色系房間" << std::endl << std::endl;
+                            if (!g_isGradient) {
+                                // 將房間換成綠色系照明
+                                g_light.setAmbient(greens[0]);
+                                g_light.setDiffuse(greens[1]);
+                                g_light.setSpecular(greens[2]);
+                                std::cout << "綠色系房間" << std::endl << std::endl;
+                            }
                             break;
                         case 'B':
                         case 'b':
-                            // 將房間換成藍色系照明
-                            g_light.setAmbient(blues[0]);
-                            g_light.setDiffuse(blues[1]);
-                            g_light.setSpecular(blues[2]);
-                            std::cout << "藍色系房間" << std::endl << std::endl;
+                            if (!g_isGradient) {
+                                // 將房間換成藍色系照明
+                                g_light.setAmbient(blues[0]);
+                                g_light.setDiffuse(blues[1]);
+                                g_light.setSpecular(blues[2]);
+                                std::cout << "藍色系房間" << std::endl << std::endl;
+                            }
                             break;
                         case 'H':
                         case 'h':
                             // 將房間換成預設照明
-                            g_light.setAmbient(glm::vec4(0.1f));
-                            g_light.setDiffuse(glm::vec4(0.8f));
-                            g_light.setSpecular(glm::vec4(1.0f));
-                            std::cout << "預設房間" << std::endl << std::endl;
+                            if (!g_isGradient) {
+                                g_light.setAmbient(glm::vec4(0.1f));
+                                g_light.setDiffuse(glm::vec4(0.8f));
+                                g_light.setSpecular(glm::vec4(1.0f));
+                                std::cout << "預設房間" << std::endl << std::endl;
+                            }
+                            break;
+                        case 'L':
+                        case 'l':
+                            // 是否漸變照明色彩
+                            g_isGradient = !g_isGradient;
+                            if (!g_isGradient) {
+                                g_colorTime = 0.0f;
+                                std::cout << "關閉自動變色" << std::endl << std::endl;
+                            }
+                            else std::cout << "開啟自動變色" << std::endl << std::endl;
                             break;
                     }
                 }   

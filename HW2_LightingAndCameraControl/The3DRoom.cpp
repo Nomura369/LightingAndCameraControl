@@ -87,8 +87,9 @@ GLint g_uiProjLoc;
 glm::mat4 g_mxUiView;
 glm::mat4 g_mxUiProj;
 
-// 切換照明風格（是否為卡通）
-bool g_isNpr = false;
+bool g_isNpr = false; // 切換照明風格（是否為卡通）
+bool g_isGradient = false; // 是否自動漸變照明色調
+float g_colorTime = 0.0f; // 計算自動變色的時間
 
 void genMaterial();
 
@@ -263,6 +264,25 @@ void update(float dt)
     g_capSpotLight.setLightOn(g_button[1].isActive());
     g_cupSpotLight.setLightOn(g_button[2].isActive());
     g_knotSpotLight.setLightOn(g_button[3].isActive());
+
+    if (g_isGradient) {
+        float speed = 0.4f;
+        g_colorTime += dt * speed;
+
+        // 範圍 [0,1] 之間變化
+        float r = sin(g_colorTime * 2.0f) * 0.5f + 0.5f;
+        float g = sin(g_colorTime * 2.0f + 2.0f) * 0.5f + 0.5f;
+        float b = sin(g_colorTime * 2.0f + 4.0f) * 0.5f + 0.5f;
+
+        glm::vec4 colorAmbient = glm::vec4(r * 0.1f, g * 0.1f, b * 0.1f, 1.0f);
+        glm::vec4 colorDiffuse = glm::vec4(r * 0.8f, g * 0.8f, b * 0.8f, 1.0f);
+        glm::vec4 colorSpecular = glm::vec4(r * 1.0f, g * 1.0f, b * 1.0f, 1.0f);
+
+        g_light.setAmbient(colorAmbient);
+        g_light.setDiffuse(colorDiffuse);
+        g_light.setSpecular(colorSpecular);
+        g_light.updateToShader();
+    }
     
     g_light.update(dt);
 }
@@ -319,8 +339,8 @@ int main() {
     std::cout << "n/N 切換照明模式" << std::endl;
     std::cout << "c/C 切換位移方式" << std::endl;
     std::cout << "rgb/RGB 改變點光源色調" << std::endl;
-    std::cout << "h/H 重設點光源色調" << std::endl << std::endl;
-
+    std::cout << "h/H 重設點光源色調" << std::endl;
+    std::cout << "l/L 自動漸變點光源色調" << std::endl << std::endl;
     
     float lastTime = (float)glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
