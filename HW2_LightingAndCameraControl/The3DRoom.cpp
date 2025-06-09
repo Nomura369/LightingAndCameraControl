@@ -304,6 +304,10 @@ int main() {
     // 呼叫 loadScene() 建立與載入 GPU 進行描繪的幾何資料 
     loadScene();
 
+    std::cout << "wasd/WASD 移動" << std::endl;
+    std::cout << "n/N 切換照明模式" << std::endl;
+    std::cout << "c/C 切換位移方式" << std::endl << std::endl;
+    
     float lastTime = (float)glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
         float currentTime = (float)glfwGetTime();

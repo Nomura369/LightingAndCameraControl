@@ -23,6 +23,7 @@ bool  g_bCamRoting = false; // 用於鏡頭的旋轉
 bool  g_bfirstMouse = true;   // 滑鼠左鍵首次按下，預設為 true
 float g_lastX = 400, g_lastY = 400; // 滑鼠移動的距離
 float g_mouseSens = 0.005f;   // 位移鏡頭的靈敏度
+bool g_isCameraBasedMoving = true; // 位移是以鏡頭座標 or 世界座標為基準（預設為前者）
 
 extern CCube g_centerloc;
 extern GLuint g_shadingProg;
@@ -58,6 +59,165 @@ RoomAABB theRoom = {
     glm::vec3(-15.0f, -15.0f, -11.0f), // roomMin
     glm::vec3(15.0f, 15.0f, 11.0f), // roomMax
 };
+
+// 位移用函式（不然程式碼太雜了）
+void moveForward(bool isForward) {
+    glm::vec3 vPos;
+    glm::vec3 front; // 代表鏡頭的不同軸向
+    float speed = 0.05f; // 鏡頭位移速度
+    glm::vec3 eyeloc, centerloc; // 暫存 g_eyeloc 和 g_centerloc 以方便計算
+    glm::mat4 mxView;
+    GLint viewLoc;
+
+    if (isForward) { // 向前移動
+        if (g_isCameraBasedMoving) {
+            // 鏡頭方向為主
+            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
+            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // front 為眼睛看向中心方向
+            eyeloc = g_eyeloc - front * speed;
+            centerloc = g_centerloc.getPos() - front * speed;
+
+            if (theRoom.isInsideRoom(eyeloc) && theRoom.isInsideRoom(centerloc)) {
+                g_eyeloc = eyeloc;
+                g_centerloc.setPos(centerloc);
+            }
+        }
+        else {
+            // 世界座標方向為主
+            vPos = g_centerloc.getPos();
+            g_centerloc.setPos(glm::vec3(vPos.x, vPos.y, vPos.z - speed));
+            g_eyeloc = CCamera::getInstance().getViewLocation();
+            g_eyeloc.z -= speed;
+
+            if (theRoom.isInsideRoom(g_eyeloc) && theRoom.isInsideRoom(g_centerloc.getPos())) {
+                // 沒問題就保留移動
+            }
+            else {
+                // 若不在房間內，還原位置
+                g_centerloc.setPos(vPos);
+                g_eyeloc = CCamera::getInstance().getViewLocation();
+            }
+        }
+    }
+    else { // 向後移動
+        if (g_isCameraBasedMoving) {
+            // 鏡頭方向為主
+            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
+            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // front 為眼睛看向中心方向
+            eyeloc = g_eyeloc + front * speed;
+            centerloc = g_centerloc.getPos() + front * speed;
+
+            if (theRoom.isInsideRoom(eyeloc) && theRoom.isInsideRoom(centerloc)) {
+                g_eyeloc = eyeloc;
+                g_centerloc.setPos(centerloc);
+            }
+        }
+        else {
+            // 世界座標方向為主
+            vPos = g_centerloc.getPos();
+            g_centerloc.setPos(glm::vec3(vPos.x, vPos.y, vPos.z + speed));
+            g_eyeloc = CCamera::getInstance().getViewLocation();
+            g_eyeloc.z += speed;
+
+            if (theRoom.isInsideRoom(g_eyeloc) && theRoom.isInsideRoom(g_centerloc.getPos())) {
+                // 沒問題就保留移動
+            }
+            else {
+                // 若不在房間內，還原位置
+                g_centerloc.setPos(vPos);
+                g_eyeloc = CCamera::getInstance().getViewLocation();
+            }
+        }
+    }
+
+    // 共通更新攝影機與 view matrix
+    CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
+    mxView = CCamera::getInstance().getViewMatrix();
+    viewLoc = glGetUniformLocation(g_shadingProg, "mxView");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
+}
+void moveRight(bool isRight) {
+    glm::vec3 vPos;
+    glm::vec3 front, up, right; // 代表鏡頭的不同軸向
+    float speed = 0.05f; // 鏡頭位移速度
+    glm::vec3 eyeloc, centerloc; // 暫存 g_eyeloc 和 g_centerloc 以方便計算
+    glm::mat4 mxView;
+    GLint viewLoc;
+
+    if (isRight) { // 向右移動
+        if (g_isCameraBasedMoving) {
+            // 鏡頭方向為主
+            g_eyeloc = CCamera::getInstance().getViewLocation(); // eye
+            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // front 向量
+            up = CCamera::getInstance().getUpVector(); // up 向量
+            right = glm::normalize(glm::cross(front, up)); // 右方向向量
+
+            eyeloc = g_eyeloc - right * speed;
+            centerloc = g_centerloc.getPos() - right * speed;
+
+            if (theRoom.isInsideRoom(eyeloc) && theRoom.isInsideRoom(centerloc)) {
+                g_eyeloc = eyeloc;
+                g_centerloc.setPos(centerloc);
+            }
+        }
+        else {
+            // 世界座標方向為主
+            vPos = g_centerloc.getPos();
+            g_centerloc.setPos(glm::vec3(vPos.x + speed, vPos.y, vPos.z));
+            g_eyeloc = CCamera::getInstance().getViewLocation();
+            g_eyeloc.x += speed;
+
+            if (theRoom.isInsideRoom(g_eyeloc) && theRoom.isInsideRoom(g_centerloc.getPos())) {
+                // 保留
+            }
+            else {
+                // 若會穿牆則還原
+                g_centerloc.setPos(vPos);
+                g_eyeloc = CCamera::getInstance().getViewLocation();
+            }
+        }
+    }
+    else { // 向左移動
+        if (g_isCameraBasedMoving) {
+            // 鏡頭方向為主
+            g_eyeloc = CCamera::getInstance().getViewLocation(); // eye
+            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // front 向量
+            up = CCamera::getInstance().getUpVector(); // up 向量
+            right = glm::normalize(glm::cross(front, up)); // 右方向向量
+
+            eyeloc = g_eyeloc + right * speed;
+            centerloc = g_centerloc.getPos() + right * speed;
+
+            if (theRoom.isInsideRoom(eyeloc) && theRoom.isInsideRoom(centerloc)) {
+                g_eyeloc = eyeloc;
+                g_centerloc.setPos(centerloc);
+            }
+        }
+        else {
+            // 世界座標方向為主
+            vPos = g_centerloc.getPos();
+            g_centerloc.setPos(glm::vec3(vPos.x - speed, vPos.y, vPos.z));
+            g_eyeloc = CCamera::getInstance().getViewLocation();
+            g_eyeloc.x -= speed;
+
+            if (theRoom.isInsideRoom(g_eyeloc) && theRoom.isInsideRoom(g_centerloc.getPos())) {
+                // 保留
+            }
+            else {
+                // 若會穿牆則還原
+                g_centerloc.setPos(vPos);
+                g_eyeloc = CCamera::getInstance().getViewLocation();
+            }
+        }
+    }
+
+    // 共通更新攝影機與 view matrix
+    CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
+    mxView = CCamera::getInstance().getViewMatrix();
+    viewLoc = glGetUniformLocation(g_shadingProg, "mxView");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
+}
+
 
 // 滑鼠按鈕按下後 callback function(回呼函式) ---------------
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -153,17 +313,17 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 //           搭配檢查左右 shift 鍵是否按下是大寫還是小寫(假設 caps 鍵沒有被按下)
 //       
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    //glm::vec3 vPos;
+     //glm::vec3 vPos;
     
-    glm::vec3 front, up, right; // 代表鏡頭的不同軸向
-    float speed = 0.05f; // 鏡頭位移速度
-    glm::vec3 eyeloc, centerloc; // 暫存 g_eyeloc 和 g_centerloc 以方便計算
+     //glm::vec3 front, up, right; // 代表鏡頭的不同軸向
+     //float speed = 0.05f; // 鏡頭位移速度
+     //glm::vec3 eyeloc, centerloc; // 暫存 g_eyeloc 和 g_centerloc 以方便計算
 
-    glm::mat4 mxView;
-    // glm::mat4 mxProj;
-    GLint viewLoc;
-    // GLint projLoc;
-    // float shin;
+     //glm::mat4 mxView;
+     //glm::mat4 mxProj;
+     //GLint viewLoc;
+     //GLint projLoc;
+     //float shin;
 
     switch (key)
     {
@@ -172,28 +332,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             break;
         case GLFW_KEY_SPACE:
             break;
-//#ifdef SPOT_TARGET
-//        case 262:   // 向右鍵
-//            vPos = g_spotTarget.getPos();
-//            g_spotTarget.setPos(glm::vec3(vPos.x + 0.15f, vPos.y, vPos.z));
-//            g_light.setTarget(g_spotTarget.getPos());
-//            break;
-//        case 263:   // 向左鍵
-//            vPos = g_spotTarget.getPos();
-//            g_spotTarget.setPos(glm::vec3(vPos.x - 0.15f, vPos.y, vPos.z));
-//            g_light.setTarget(g_spotTarget.getPos());
-//            break;
-//        case 264:   // 向下鍵
-//            vPos = g_spotTarget.getPos();
-//            g_spotTarget.setPos(glm::vec3(vPos.x, vPos.y, vPos.z - 0.15f));
-//            g_light.setTarget(g_spotTarget.getPos());
-//            break;
-//        case 265:   // 向上鍵
-//            vPos = g_spotTarget.getPos();
-//            g_spotTarget.setPos(glm::vec3(vPos.x, vPos.y, vPos.z + 0.15f));
-//            g_light.setTarget(g_spotTarget.getPos());
-//            break;
-//#endif
         default: // 針對英文字母大小寫進行處理
             if (action == GLFW_PRESS || action == GLFW_REPEAT) {
                 // 檢查 Shift 鍵(左右兩邊各一個)是否被按下
@@ -206,86 +344,41 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                     switch (letter) {
                         case 'W':
                         case 'w':
-                            // 往前移動
-                            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
-                            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // center 位置則為 g_centerloc.getPos()
-                            eyeloc = g_eyeloc - front * speed; 
-                            centerloc = g_centerloc.getPos() - front * speed;
-                            // 檢查是否會穿牆後再進行移動
-                            if (theRoom.isInsideRoom(eyeloc) && theRoom.isInsideRoom(centerloc)) {
-                                g_eyeloc = eyeloc; // 根據鏡頭朝向方向（front）進行位移
-                                g_centerloc.setPos(centerloc); // 讓作為 center 的 cube 房間也跟著移動
-                                // 更新攝影機位置與矩陣
-                                CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
-                                mxView = CCamera::getInstance().getViewMatrix();
-                                viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); // 取得 view matrix 變數的位置
-                                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
-                            }
+                            moveForward(true);
                             break;
                         case 'S':
                         case 's':
-                            // 往後移動
-                            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
-                            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // center 位置則為 g_centerloc.getPos()
-                            eyeloc = g_eyeloc + front * speed;
-                            centerloc = g_centerloc.getPos() + front * speed;
-                            // 檢查是否會穿牆後再進行移動
-                            if (theRoom.isInsideRoom(eyeloc) && theRoom.isInsideRoom(centerloc)) {
-                                g_eyeloc = eyeloc; // 根據鏡頭朝向方向（front）進行位移
-                                g_centerloc.setPos(centerloc); // 讓作為 center 的 cube 房間也跟著移動
-                                // 更新攝影機位置與矩陣
-                                CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
-                                mxView = CCamera::getInstance().getViewMatrix();
-                                viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); // 取得 view matrix 變數的位置
-                                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
-                            }
+                            moveForward(false);
                             break;
                         case 'A':
                         case 'a':
-                            // 往左移動
-                            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
-                            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // center 位置則為 g_centerloc.getPos()
-                            up = CCamera::getInstance().getUpVector();
-                            right = glm::normalize(glm::cross(front, up)); // 取得鏡頭右側軸向
-                            
-                            eyeloc = g_eyeloc + right * speed;
-                            centerloc = g_centerloc.getPos() + right * speed;
-                            // 檢查是否會穿牆後再進行移動
-                            if (theRoom.isInsideRoom(eyeloc) && theRoom.isInsideRoom(centerloc)) {
-                                g_eyeloc = eyeloc; // 根據鏡頭右側（right）進行位移
-                                g_centerloc.setPos(centerloc); // 讓作為 center 的 cube 房間也跟著移動
-                                // 更新攝影機位置與矩陣
-                                CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
-                                mxView = CCamera::getInstance().getViewMatrix();
-                                viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); // 取得 view matrix 變數的位置
-                                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
-                            }
+                            moveRight(false);
                             break;
                         case 'D':
                         case 'd':
-                            // 往右移動
-                            g_eyeloc = CCamera::getInstance().getViewLocation(); // 取得 eye 位置
-                            front = glm::normalize(g_eyeloc - g_centerloc.getPos()); // center 位置則為 g_centerloc.getPos()
-                            up = CCamera::getInstance().getUpVector();
-                            right = glm::normalize(glm::cross(front, up)); // 取得鏡頭右側軸向
-                            
-                            eyeloc = g_eyeloc - right * speed;
-                            centerloc = g_centerloc.getPos() - right * speed;
-                            // 檢查是否會穿牆後再進行移動
-                            if (theRoom.isInsideRoom(eyeloc) && theRoom.isInsideRoom(centerloc)) {
-                                g_eyeloc = eyeloc; // 根據鏡頭右側（right）進行位移
-                                g_centerloc.setPos(centerloc); // 讓作為 center 的 cube 房間也跟著移動
-                                // 更新攝影機位置與矩陣
-                                CCamera::getInstance().updateViewCenter(g_eyeloc, g_centerloc.getPos());
-                                mxView = CCamera::getInstance().getViewMatrix();
-                                viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); // 取得 view matrix 變數的位置
-                                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
-                            }
+                            moveRight(true);
                             break;
                         case 'N':
                         case 'n':
                             // 切換照明風格（是否為卡通）
                             g_isNpr = !g_isNpr;
+                            if (g_isNpr) {
+                                std::cout << "目前為 NPR 模式" << std::endl << std::endl;
+                            }
+                            else {
+                                std::cout << "目前為 Per-Pixel Lighting 模式" << std::endl << std::endl;
+                            }
+                            break;
+                        case 'C':
+                        case 'c':
+                            // 切換位移視角
+                            g_isCameraBasedMoving = !g_isCameraBasedMoving;
+                            if (g_isCameraBasedMoving) {
+                                std::cout << "目前以「鏡頭方向」進行位移" << std::endl << std::endl;
+                            }
+                            else {
+                                std::cout << "目前以「世界座標方向」進行位移" << std::endl << std::endl;
+                            }
                             break;
                     }
                 }   
