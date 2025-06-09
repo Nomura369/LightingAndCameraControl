@@ -55,7 +55,7 @@ public:
     void setShaderID(GLuint shaderProg, std::string uniformName, bool displayon=true);
     void updateToShader();
     void update(float dt);
-    void setMotionEnabled(); // 設定為開關機制，
+    void setMotionEnabled(); // 設定為開關機制
     void updateMotion(float dt);
 
     // 描繪代表 light 的模型

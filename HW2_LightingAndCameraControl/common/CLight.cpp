@@ -78,7 +78,10 @@ void CLight::getAttenuation(float& c, float& l, float& q) {
     c = _constant; l = _linear;  q = _quadratic; 
 }
 
-void CLight::setLightOn(bool enable) { _lighingOn = enable; }
+void CLight::setLightOn(bool enable) { 
+    _lighingOn = enable; 
+    updateToShader();
+}
 bool CLight::isLightOn(){ return _lighingOn; }
 
 void CLight::setMotionEnabled() { _motionOn = !_motionOn; }
@@ -138,18 +141,23 @@ void CLight::setShaderID(GLuint shaderProg, std::string name, bool displayon)
 void CLight::updateToShader()
 {
     //if (!_needsUpdate) return;
+    
+    // 如果沒有啟用，就把強度設為零
+    glm::vec4 amb = _lighingOn ? _ambient : glm::vec4(0.0f);
+    glm::vec4 diff = _lighingOn ? _diffuse : glm::vec4(0.0f);
+    glm::vec4 spec = _lighingOn ? _specular : glm::vec4(0.0f);
 
     GLint loc = glGetUniformLocation(_shaderID, (_lightname + ".position").c_str());
     glUniform3fv(loc, 1, glm::value_ptr(_position));
 
     loc = glGetUniformLocation(_shaderID, (_lightname + ".ambient").c_str());
-    glUniform4fv(loc, 1, glm::value_ptr(_ambient));
+    glUniform4fv(loc, 1, glm::value_ptr(amb));
 
     loc = glGetUniformLocation(_shaderID, (_lightname + ".diffuse").c_str());
-    glUniform4fv(loc, 1, glm::value_ptr(_diffuse));
+    glUniform4fv(loc, 1, glm::value_ptr(diff));
 
     loc = glGetUniformLocation(_shaderID, (_lightname + ".specular").c_str());
-    glUniform4fv(loc, 1, glm::value_ptr(_specular));
+    glUniform4fv(loc, 1, glm::value_ptr(spec));
 
     loc = glGetUniformLocation(_shaderID, (_lightname + ".constant").c_str());
     glUniform1f(loc, _constant);

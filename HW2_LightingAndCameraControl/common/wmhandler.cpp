@@ -6,13 +6,14 @@
 #include "CCamera.h"
 #include "wmhandler.h"
 #include "arcball.h"
+#include "CMaterial.h"
+#include "CLight.h"
+#include "CButton.h"
 
-#include "../common/CMaterial.h"
 #include "../models/CQuad.h"
 #include "../models/CCube.h"
 #include "../models/CSphere.h"
 #include "../models/CTeapot.h"
-#include "../common/CLight.h"
 
 //#define SPOT_TARGET
 
@@ -30,6 +31,8 @@ extern CLight g_light;
 
 extern CMaterial g_matWaterGreen;
 extern CSphere  g_sphere; 
+
+extern std::array<CButton, 4> g_button;
 
 Arcball g_arcball; //保留未用
 
@@ -69,6 +72,11 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 		if (action == GLFW_PRESS)
 		{
             g_bCamRoting = true;
+            // 啟動或關閉按鈕們
+            if (g_button[0].handleClick((float)xpos, height - (float)ypos)) {  }
+            if (g_button[1].handleClick((float)xpos, height - (float)ypos)) {  }
+            if (g_button[2].handleClick((float)xpos, height - (float)ypos)) {  }
+            if (g_button[3].handleClick((float)xpos, height - (float)ypos)) {  }
 		}
         else if (action == GLFW_RELEASE)
         {
@@ -303,11 +311,11 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                                 glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
                             }
                             break;
-                        case 'L':
-                        case 'l':
-                            // 讓點光源進行圓周運動
-                            g_light.setMotionEnabled();
-                            break;
+                        //case 'L':
+                        //case 'l':
+                        //    // 讓點光源進行圓周運動
+                        //    g_light.setMotionEnabled();
+                        //    break;
                     }
                 }   
             }

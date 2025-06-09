@@ -72,3 +72,7 @@ void CButton::drawRaw()
     glDrawElements(GL_TRIANGLES, _idxCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
+
+bool CButton::isActive() {
+    return _bActive;
+}

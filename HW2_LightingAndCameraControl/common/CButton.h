@@ -22,5 +22,5 @@ public:
     bool handleClick(float mouseX, float mouseY);  // true:在按鈕上按下
     virtual void draw() override;
     virtual void drawRaw() override;
-
+    bool isActive();
 };

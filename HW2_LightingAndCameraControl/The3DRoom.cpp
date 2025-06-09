@@ -57,6 +57,7 @@ CLight g_light(glm::vec3(5.0f, 5.0f, 0.0f)); // 預設為點光源
 CLight g_capSpotLight(glm::vec3(10.0f, 10.0f, -10.0f), glm::vec3(8.0f, 0.5f, -8.0f)); // 照亮 capsule 模型
 CLight g_cupSpotLight(glm::vec3(-10.0f, 10.0f, -10.0f), glm::vec3(-8.0f, 0.5f, -8.0f)); // 照亮 cup 模型
 CLight g_knotSpotLight(glm::vec3(0.0f, 10.0f, 10.0f), glm::vec3(0.0f, 0.5f, 8.0f)); // 照亮 knot 模型
+bool g_bOnBtnActive[4] = { false, false, false, false }; // 判斷按鈕們是否被按下
 
 // 全域材質（可依模型分別設定）
 CMaterial g_matBeige;   // 淺米白
@@ -70,21 +71,21 @@ CMaterial g_matWoodBleached;
 
 // 2D 素材宣告區
 std::array<CButton, 4> g_button = {
-    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.85f, 0.2f, 1.0f), glm::vec4(0.9f, 0.7f, 0.1f, 1.0f)), // 點光源 yellow
-    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.7f, 0.85f, 1.0f), glm::vec4(0.85f, 0.55f, 0.7f, 1.0f)), // 藥丸聚光燈 pink
-    CButton(50.0f, 50.0f, glm::vec4(0.65f, 0.9f, 1.0f, 1.0f), glm::vec4(0.5f, 0.75f, 0.9f, 1.0f)), // 杯子聚光燈 blue
-    CButton(50.0f, 50.0f, glm::vec4(0.65f, 1.0f, 0.75f, 1.0f), glm::vec4(0.50f, 0.85f, 0.65f, 1.0f)), // 紐結聚光燈 green
+    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.85f, 0.2f, 1.0f), glm::vec4(0.8f, 0.6f, 0.0f, 1.0f)), // 點光源 yellow
+    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.7f, 0.85f, 1.0f), glm::vec4(0.75f, 0.45f, 0.6f, 1.0f)), // 藥丸聚光燈 pink
+    CButton(50.0f, 50.0f, glm::vec4(0.65f, 0.9f, 1.0f, 1.0f), glm::vec4(0.4f, 0.65f, 0.8f, 1.0f)), // 杯子聚光燈 blue
+    CButton(50.0f, 50.0f, glm::vec4(0.65f, 1.0f, 0.75f, 1.0f), glm::vec4(0.4f, 0.75f, 0.55f, 1.0f)), // 紐結聚光燈 green
 };
 
 // 投影矩陣
-GLint viewLoc;
-GLint projLoc;
-glm::mat4 mxView;
-glm::mat4 mxProj;
-GLint uiViewLoc;
-GLint uiProjLoc;
-glm::mat4 mxUiView;
-glm::mat4 mxUiProj;
+GLint g_viewLoc;
+GLint g_projLoc;
+glm::mat4 g_mxView;
+glm::mat4 g_mxProj;
+GLint g_uiViewLoc;
+GLint g_uiProjLoc;
+glm::mat4 g_mxUiView;
+glm::mat4 g_mxUiProj;
 
 void genMaterial();
 
@@ -156,33 +157,33 @@ void loadScene(void)
     CCamera::getInstance().updateView(g_eyeloc); // 設定 eye 位置
     CCamera::getInstance().updateCenter(glm::vec3(0,4,0));
 	CCamera::getInstance().updatePerspective(45.0f, (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
-    mxView = CCamera::getInstance().getViewMatrix();
-	mxProj = CCamera::getInstance().getProjectionMatrix();
+    g_mxView = CCamera::getInstance().getViewMatrix();
+    g_mxProj = CCamera::getInstance().getProjectionMatrix();
 
-    viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); 	// 取得 view matrix 變數的位置 v
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
+    g_viewLoc = glGetUniformLocation(g_shadingProg, "mxView"); 	// 取得 view matrix 變數的位置 v
+    glUniformMatrix4fv(g_viewLoc, 1, GL_FALSE, glm::value_ptr(g_mxView));
 
-    projLoc = glGetUniformLocation(g_shadingProg, "mxProj"); 	// 取得投影矩陣變數的位置 v
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(mxProj));
+    g_projLoc = glGetUniformLocation(g_shadingProg, "mxProj"); 	// 取得投影矩陣變數的位置 v
+    glUniformMatrix4fv(g_projLoc, 1, GL_FALSE, glm::value_ptr(g_mxProj));
 
     // UI 設定
-    g_button[0].setScreenPos(125.0f, -350.0f);
+    g_button[0].setScreenPos(525.0f, 50.0f);
     g_button[0].init(g_uiShadingProg);
-    g_button[1].setScreenPos(200.0f, -350.0f);
+    g_button[1].setScreenPos(600.0f, 50.0f);
     g_button[1].init(g_uiShadingProg);
-    g_button[2].setScreenPos(275.0f, -350.0f);
+    g_button[2].setScreenPos(675.0f, 50.0f);
     g_button[2].init(g_uiShadingProg);
-    g_button[3].setScreenPos(350.0f, -350.0f);
+    g_button[3].setScreenPos(750.0f, 50.0f);
     g_button[3].init(g_uiShadingProg);
     
-    mxUiView = glm::mat4(1.0f);
-    mxUiProj = glm::ortho(-(float)SCREEN_WIDTH / 2, (float)SCREEN_WIDTH / 2, -(float)SCREEN_HEIGHT / 2, (float)SCREEN_HEIGHT / 2, -1.0f, 1.0f);
+    g_mxUiView = glm::mat4(1.0f);
+    g_mxUiProj = glm::ortho(0.0f, (float)SCREEN_WIDTH, 0.0f, (float)SCREEN_HEIGHT, -1.0f, 1.0f);
 
-    uiViewLoc = glGetUniformLocation(g_uiShadingProg, "mxView"); 	// 取得 view matrix 變數的位置 v
-    glUniformMatrix4fv(uiViewLoc, 1, GL_FALSE, glm::value_ptr(mxUiView));
+    g_uiViewLoc = glGetUniformLocation(g_uiShadingProg, "mxView"); 	// 取得 view matrix 變數的位置 v
+    glUniformMatrix4fv(g_uiViewLoc, 1, GL_FALSE, glm::value_ptr(g_mxUiView));
 
-    uiProjLoc = glGetUniformLocation(g_uiShadingProg, "mxProj"); 	// 取得投影矩陣變數的位置 v
-    glUniformMatrix4fv(uiProjLoc, 1, GL_FALSE, glm::value_ptr(mxUiProj));
+    g_uiProjLoc = glGetUniformLocation(g_uiShadingProg, "mxProj"); 	// 取得投影矩陣變數的位置 v
+    glUniformMatrix4fv(g_uiProjLoc, 1, GL_FALSE, glm::value_ptr(g_mxUiProj));
   
     glClearColor(0.0f, 0.0f, 0.5f, 1.0f); // 設定清除 back buffer 背景的顏色
     glEnable(GL_DEPTH_TEST); // 啟動深度測試
@@ -203,10 +204,10 @@ void render(void)
     //glUniform3fv(glGetUniformLocation(g_shadingProg, "lightPos"), 1, glm::value_ptr(g_light.getPos()));
     
     // 先切換回 3d 投影畫模型，再切換到 2d 投影畫 UI
-    mxView = CCamera::getInstance().getViewMatrix();
-    mxProj = CCamera::getInstance().getProjectionMatrix();
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(mxView));
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(mxProj));
+    g_mxView = CCamera::getInstance().getViewMatrix();
+    g_mxProj = CCamera::getInstance().getProjectionMatrix();
+    glUniformMatrix4fv(g_viewLoc, 1, GL_FALSE, glm::value_ptr(g_mxView));
+    glUniformMatrix4fv(g_projLoc, 1, GL_FALSE, glm::value_ptr(g_mxProj));
 
     for (int i = 0; i < ROW_NUM; i++)
         for (int j = 0; j < ROW_NUM; j++) {
@@ -232,8 +233,8 @@ void render(void)
     g_house.drawRaw();
 
     glUseProgram(g_uiShadingProg);
-    glUniformMatrix4fv(uiViewLoc, 1, GL_FALSE, glm::value_ptr(mxUiView));
-    glUniformMatrix4fv(uiProjLoc, 1, GL_FALSE, glm::value_ptr(mxUiProj));
+    glUniformMatrix4fv(g_uiViewLoc, 1, GL_FALSE, glm::value_ptr(g_mxUiView));
+    glUniformMatrix4fv(g_uiProjLoc, 1, GL_FALSE, glm::value_ptr(g_mxUiProj));
 
     for (int i = 0; i < 4; i++) {
         g_button[i].draw();
@@ -243,6 +244,11 @@ void render(void)
 
 void update(float dt)
 {
+    if(g_button[0].isActive()) g_light.setMotionEnabled(); // 讓點光源進行圓周運動
+    g_capSpotLight.setLightOn(g_button[1].isActive());
+    g_cupSpotLight.setLightOn(g_button[2].isActive());
+    g_knotSpotLight.setLightOn(g_button[3].isActive());
+    
     g_light.update(dt);
 }
 
