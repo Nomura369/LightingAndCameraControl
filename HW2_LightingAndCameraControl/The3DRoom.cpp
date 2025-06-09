@@ -71,10 +71,10 @@ CMaterial g_matWoodBleached;
 
 // 2D 素材宣告區
 std::array<CButton, 4> g_button = {
-    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.85f, 0.2f, 1.0f), glm::vec4(0.8f, 0.6f, 0.0f, 1.0f)), // 點光源 yellow
-    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.7f, 0.85f, 1.0f), glm::vec4(0.75f, 0.45f, 0.6f, 1.0f)), // 藥丸聚光燈 pink
-    CButton(50.0f, 50.0f, glm::vec4(0.65f, 0.9f, 1.0f, 1.0f), glm::vec4(0.4f, 0.65f, 0.8f, 1.0f)), // 杯子聚光燈 blue
-    CButton(50.0f, 50.0f, glm::vec4(0.65f, 1.0f, 0.75f, 1.0f), glm::vec4(0.4f, 0.75f, 0.55f, 1.0f)), // 紐結聚光燈 green
+    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.85f, 0.2f, 1.0f), glm::vec4(0.7f, 0.5f, 0.0f, 1.0f)), // 點光源 yellow
+    CButton(50.0f, 50.0f, glm::vec4(1.0f, 0.7f, 0.85f, 1.0f), glm::vec4(0.65f, 0.35f, 0.5f, 1.0f)), // 藥丸聚光燈 pink
+    CButton(50.0f, 50.0f, glm::vec4(0.65f, 0.9f, 1.0f, 1.0f), glm::vec4(0.3f, 0.55f, 0.7f, 1.0f)), // 杯子聚光燈 blue
+    CButton(50.0f, 50.0f, glm::vec4(0.65f, 1.0f, 0.75f, 1.0f), glm::vec4(0.3f, 0.65f, 0.45f, 1.0f)), // 紐結聚光燈 green
 };
 
 // 投影矩陣
@@ -107,6 +107,17 @@ void loadScene(void)
     g_cupSpotLight.setCutOffDeg(20.0f, 60.0f, 1.5f);
     g_knotSpotLight.setShaderID(g_shadingProg, "uLight[3]");
     g_knotSpotLight.setCutOffDeg(20.0f, 60.0f, 1.5f);
+
+    // 燈光顏色
+    // 紅色系
+    /*g_spotLight_1.setAmbient(glm::vec4(0.1f, 0.0f, 0.0f, 1.0f));
+    g_spotLight_1.setDiffuse(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    g_spotLight_1.setSpecular(glm::vec4(1.0f, 0.3f, 0.3f, 1.0f));*/
+    // 綠色系
+    /*g_spotLight_2.setAmbient(glm::vec4(0.0f, 0.0f, 0.1f, 1.0f));
+    g_spotLight_2.setDiffuse(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+    g_spotLight_2.setSpecular(glm::vec4(0.3f, 0.3f, 1.0f, 1.0f));*/
+    // 藍色系
 
     glUniform1i(glGetUniformLocation(g_shadingProg, "uLightNum"), 4);
     glUniform1i(glGetUniformLocation(g_shadingProg, "uIsNpr"), 0); // 切換照明風格（是否為卡通）
@@ -306,7 +317,10 @@ int main() {
 
     std::cout << "wasd/WASD 移動" << std::endl;
     std::cout << "n/N 切換照明模式" << std::endl;
-    std::cout << "c/C 切換位移方式" << std::endl << std::endl;
+    std::cout << "c/C 切換位移方式" << std::endl;
+    std::cout << "rgb/RGB 改變點光源色調" << std::endl;
+    std::cout << "h/H 重設點光源色調" << std::endl << std::endl;
+
     
     float lastTime = (float)glfwGetTime();
     while (!glfwWindowShouldClose(window)) {

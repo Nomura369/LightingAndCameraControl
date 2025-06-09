@@ -29,6 +29,9 @@ extern CCube g_centerloc;
 extern GLuint g_shadingProg;
 extern glm::vec3 g_eyeloc;
 extern CLight g_light;
+extern CLight g_capSpotLight;
+extern CLight g_cupSpotLight;
+extern CLight g_knotSpotLight;
 
 extern CMaterial g_matWaterGreen;
 extern CSphere  g_sphere; 
@@ -313,17 +316,21 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 //           搭配檢查左右 shift 鍵是否按下是大寫還是小寫(假設 caps 鍵沒有被按下)
 //       
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-     //glm::vec3 vPos;
-    
-     //glm::vec3 front, up, right; // 代表鏡頭的不同軸向
-     //float speed = 0.05f; // 鏡頭位移速度
-     //glm::vec3 eyeloc, centerloc; // 暫存 g_eyeloc 和 g_centerloc 以方便計算
-
-     //glm::mat4 mxView;
-     //glm::mat4 mxProj;
-     //GLint viewLoc;
-     //GLint projLoc;
-     //float shin;
+    // 紅色系照明（依照 ambient、diffuse 和 specular 的順序）
+    glm::vec4 reds[3] = { glm::vec4(0.15f, 0.05f, 0.05f, 1.0f),
+                          glm::vec4(0.8f, 0.2f, 0.2f, 1.0f),
+                          glm::vec4(0.9f, 0.4f, 0.4f, 1.0f)
+    };
+    // 綠色系照明
+    glm::vec4 greens[3] = { glm::vec4(0.05f, 0.15f, 0.05f, 1.0f),
+                            glm::vec4(0.2f, 0.8f, 0.2f, 1.0f),
+                            glm::vec4(0.4f, 0.9f, 0.4f, 1.0f)
+    };
+    // 藍色系照明
+    glm::vec4 blues[3] = { glm::vec4(0.05f, 0.05f, 0.15f, 1.0f),
+                           glm::vec4(0.2f, 0.2f, 0.8f, 1.0f),
+                           glm::vec4(0.4f, 0.4f, 0.9f, 1.0f)
+    };
 
     switch (key)
     {
@@ -379,6 +386,38 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                             else {
                                 std::cout << "目前以「世界座標方向」進行位移" << std::endl << std::endl;
                             }
+                            break;
+                        case 'R':
+                        case 'r':
+                            // 將房間換成紅色系照明
+                            g_light.setAmbient(reds[0]);
+                            g_light.setDiffuse(reds[1]);
+                            g_light.setSpecular(reds[2]);
+                            std::cout << "紅色系房間" << std::endl << std::endl;
+                            break;
+                        case 'G':
+                        case 'g':
+                            // 將房間換成綠色系照明
+                            g_light.setAmbient(greens[0]);
+                            g_light.setDiffuse(greens[1]);
+                            g_light.setSpecular(greens[2]);
+                            std::cout << "綠色系房間" << std::endl << std::endl;
+                            break;
+                        case 'B':
+                        case 'b':
+                            // 將房間換成藍色系照明
+                            g_light.setAmbient(blues[0]);
+                            g_light.setDiffuse(blues[1]);
+                            g_light.setSpecular(blues[2]);
+                            std::cout << "藍色系房間" << std::endl << std::endl;
+                            break;
+                        case 'H':
+                        case 'h':
+                            // 將房間換成預設照明
+                            g_light.setAmbient(glm::vec4(0.1f));
+                            g_light.setDiffuse(glm::vec4(0.8f));
+                            g_light.setSpecular(glm::vec4(1.0f));
+                            std::cout << "預設房間" << std::endl << std::endl;
                             break;
                     }
                 }   
